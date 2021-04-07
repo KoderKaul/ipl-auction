@@ -1,6 +1,7 @@
 {
-  "name": "react-chat",
+  "name": "ipl-auction",
   "version": "0.1.0",
+  "homepage": "/login",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.3",
@@ -14,6 +15,7 @@
     "moment": "^2.27.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-rounded-image": "^2.0.11",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.3",
     "react-scroll-to-bottom": "^4.1.0",

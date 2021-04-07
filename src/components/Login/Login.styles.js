@@ -19,26 +19,26 @@ export default makeStyles((theme) => ({
     height: "300px",
     padding: "20px",
     margin: "50px 0",
-    borderRadius: "10px"
+    borderRadius: "10px",
   },
-  imgContainer:{
+  imgContainer: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
   },
-  doraImg:{
-      height: "250px",
+  doraImg: {
+    height: "250px",
   },
-  iplLogo:{
+  iplLogo: {
     height: "50px",
     marginBottom: "10px",
-},
-banner:{
+  },
+  banner: {
     height: "250px",
-},
-submitButton: {
-    marginTop: "5px"
-}
+  },
+  submitButton: {
+    marginTop: "5px",
+  },
 }));

@@ -1,43 +1,34 @@
-import React from 'react';
-import './App.css';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-  useLocation
-} from "react-router-dom";
-import Login from './components/Login/Login';
-import JoinRoom from './components/JoinRoom/JoinRoom';
-import AddRoom from './components/AddRoom';
-import ChatRoom from './components/MainScreen/ChatRoom/ChatRoom';
-import useStyles from './App.styles'
+import React from "react";
+import "./App.css";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Login from "./components/Login/Login";
+import JoinRoom from "./components/JoinRoom/JoinRoom";
+import AddRoom from "./components/AddRoom";
+import ChatRoom from "./components/MainScreen/ChatRoom/ChatRoom";
+import useStyles from "./App.styles";
+import PlayersDisplay from "./components/PlayersDisplay";
 
 function App() {
-  let location = useLocation();
-const classes = useStyles();
+  const classes = useStyles();
   return (
     <Router>
       <div className={classes.App}>
-        <Redirect
-          to={{
-            pathname: "/roomlist",
-            state: { from: location }
-          }}
-        />
         <Switch>
           <Route path="/login">
             <Login />
           </Route>
-          <SecureRoute path="/roomlist">
+          <Route path="/playerlist">
+            <PlayersDisplay />
+          </Route>
+          <Route path="/roomlist">
             <JoinRoom />
-          </SecureRoute>
-          <SecureRoute path="/addroom">
+          </Route>
+          <Route path="/addroom">
             <AddRoom />
-          </SecureRoute>
-          <SecureRoute path="/chatroom/:room">
+          </Route>
+          <Route path="/chatroom/:room">
             <ChatRoom />
-          </SecureRoute>
+          </Route>
         </Switch>
       </div>
     </Router>
@@ -46,22 +37,22 @@ const classes = useStyles();
 
 export default App;
 
-function SecureRoute({ children, ...rest }) {
-  return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        localStorage.getItem('nickName') ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/login",
-              state: { from: location }
-            }}
-          />
-        )
-      }
-    />
-  );
-}
+// function SecureRoute({ children, ...rest }) {
+//   return (
+//     <Route
+//       {...rest}
+//       render={({ location }) =>
+//         localStorage.getItem("nickName") ? (
+//           children
+//         ) : (
+//           <Redirect
+//             to={{
+//               pathname: "/login",
+//               state: { from: location },
+//             }}
+//           />
+//         )
+//       }
+//     />
+//   );
+// }
