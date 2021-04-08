@@ -1,4 +1,12 @@
-import { CssBaseline, Grid, Typography, Paper, AppBar, Toolbar, Button } from "@material-ui/core";
+import {
+  CssBaseline,
+  Grid,
+  Typography,
+  Paper,
+  AppBar,
+  Toolbar,
+  Button,
+} from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import ReactRoundedImage from "react-rounded-image";
 import { Players } from "../../Players";
@@ -17,16 +25,13 @@ const PlayersDisplay = () => {
     fetchData();
   }, []);
   return (
-    <div
-    ><AppBar position="static">
+    <div>
+      <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
             Welcome {nickname} to IPL Auction Presented by DORA
           </Typography>
-          <Button
-            color="inherit"
-            endIcon={<ExitToAppIcon />}
-          >
+          <Button color="inherit" endIcon={<ExitToAppIcon />}>
             Leave Room
           </Button>
         </Toolbar>
@@ -39,9 +44,7 @@ const PlayersDisplay = () => {
           </Typography>
         </Grid>
         {players
-          .filter((player) => {
-            if (player.teamName === "Mumbai Indians") return player;
-          })
+          .filter((player) => player.teamName === "Mumbai Indians")
           .map((player, index) => {
             return (
               <Grid item xs={2}>
@@ -58,9 +61,7 @@ const PlayersDisplay = () => {
           </Typography>
         </Grid>
         {players
-          .filter((player) => {
-            if (player.teamName === "Chennai Super Kings") return player;
-          })
+          .filter((player) => player.teamName === "Chennai Super Kings")
           .map((player, index) => {
             return (
               <Grid item xs={2}>
@@ -77,9 +78,7 @@ const PlayersDisplay = () => {
           </Typography>
         </Grid>
         {players
-          .filter((player) => {
-            if (player.teamName === "Kolkata Knight Riders") return player;
-          })
+          .filter((player) => player.teamName === "Kolkata Knight Riders")
           .map((player, index) => {
             return (
               <Grid item xs={2}>
@@ -96,9 +95,7 @@ const PlayersDisplay = () => {
           </Typography>
         </Grid>
         {players
-          .filter((player) => {
-            if (player.teamName === "Delhi Capitals") return player;
-          })
+          .filter((player) => player.teamName === "Delhi Capitals")
           .map((player, index) => {
             return (
               <Grid item xs={2}>
@@ -115,9 +112,7 @@ const PlayersDisplay = () => {
           </Typography>
         </Grid>
         {players
-          .filter((player) => {
-            if (player.teamName === "Rajasthan Royals") return player;
-          })
+          .filter((player) => player.teamName === "Rajasthan Royals")
           .map((player, index) => {
             return (
               <Grid item xs={2}>
@@ -134,9 +129,7 @@ const PlayersDisplay = () => {
           </Typography>
         </Grid>
         {players
-          .filter((player) => {
-            if (player.teamName === "Sunrisers Hyderabad") return player;
-          })
+          .filter((player) => player.teamName === "Sunrisers Hyderabad")
           .map((player, index) => {
             return (
               <Grid item xs={2} spacing={2}>
@@ -153,10 +146,7 @@ const PlayersDisplay = () => {
           </Typography>
         </Grid>
         {players
-          .filter((player) => {
-            if (player.teamName === "Royal Challengers Bangalore")
-              return player;
-          })
+          .filter((player) => player.teamName === "Royal Challengers Bangalore")
           .map((player, index) => {
             return (
               <Grid item xs={2}>
@@ -173,9 +163,7 @@ const PlayersDisplay = () => {
           </Typography>
         </Grid>
         {players
-          .filter((player) => {
-            if (player.teamName === "Kings XI Punjab") return player;
-          })
+          .filter((player) => player.teamName === "Kings XI Punjab")
           .map((player, index) => {
             return (
               <Grid item xs={2}>
@@ -187,8 +175,8 @@ const PlayersDisplay = () => {
     </div>
   );
 };
-const Player = (prop) => {
-    const classes = useStyles();
+export const Player = (prop) => {
+  const classes = useStyles();
   return (
     <div>
       <Grid
@@ -198,36 +186,44 @@ const Player = (prop) => {
         spacing={2}
         alignItems="center"
       >
-      <Paper className={classes.innerContainer} >
-        <Grid item xs={12}>
-          <ReactRoundedImage
-            image={prop.player.image_url}
-            imageWidth="180"
-            imageHeight="180"
-            roundedColor="#000"
-            roundedSize="6"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body1" style={{margin: "10px 0px"}}>
-            {prop.player.playerName.toUpperCase()}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body1" >
-            Role: {prop.player.role.toUpperCase()}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body1" >
-            Rating: {prop.player.rating}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body1" >
-            Base Price: {prop.player.basePrice.toUpperCase()}
-          </Typography>
-        </Grid>
+        <Paper className={classes.innerContainer}>
+          <Grid item xs={12}>
+            <ReactRoundedImage
+              image={prop.player.image_url}
+              imageWidth="180"
+              imageHeight="180"
+              roundedColor="#000"
+              roundedSize="6"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1" style={{ margin: "10px 0px" }}>
+              {prop.player.playerName != null
+                ? prop.player.playerName.toUpperCase()
+                : prop.player.toUpperCase()}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              Role:{" "}
+              {prop.player.role != null
+                ? prop.player.role.toUpperCase()
+                : console.log(prop)}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              Rating: {prop.player.rating}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              Base Price:{" "}
+              {prop.player.basePrice != null
+                ? prop.player.basePrice.toUpperCase()
+                : console.log(prop)}
+            </Typography>
+          </Grid>
         </Paper>
       </Grid>
     </div>

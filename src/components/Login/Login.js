@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import {
   Typography,
@@ -31,7 +31,7 @@ function Login() {
     setShowLoading(true);
     ref
       .orderByChild("nickName")
-      .equalTo(user.nickName.trim())
+      .equalTo(user.nickName)
       .once("value", (snapshot) => {
         if (snapshot.exists()) {
           localStorage.setItem("nickName", user.nickName);
@@ -41,6 +41,7 @@ function Login() {
           const newUser = firebase.database().ref("users/").push();
           newUser.set(user);
           localStorage.setItem("nickName", user.nickName);
+
           history.push("/roomlist");
           setShowLoading(false);
         }
