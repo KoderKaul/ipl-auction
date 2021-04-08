@@ -86,18 +86,18 @@ function JoinRoom() {
       .equalTo(myRoomname)
       .on("value", (resp) => {
         let roomuser = [];
-            roomuser = snapshotToArray(resp);
-            const user = roomuser.find(x => x.nickname === nickName);
-            if (user !== undefined) {
-              const userRef = firebase.database().ref('roomusers/' + user.key);
-              userRef.update({status: 'online'});
-            } else {
-              const newroomuser = { roomname: '', nickname: '', status: '' };
-              newroomuser.roomname = myRoomname;
-              newroomuser.nickname = nickName;
-              newroomuser.status = 'online';
-              const newRoomUser = firebase.database().ref('roomusers/').push();
-              newRoomUser.set(newroomuser);
+        roomuser = snapshotToArray(resp);
+        const user = roomuser.find((x) => x.nickname === nickName);
+        if (user !== undefined) {
+          const userRef = firebase.database().ref("roomusers/" + user.key);
+          userRef.update({ status: "online" });
+        } else {
+          const newroomuser = { roomname: "", nickname: "", status: "" };
+          newroomuser.roomname = myRoomname;
+          newroomuser.nickname = nickName;
+          newroomuser.status = "online";
+          const newRoomUser = firebase.database().ref("roomusers/").push();
+          newRoomUser.set(newroomuser);
         }
       });
 
@@ -136,10 +136,10 @@ function JoinRoom() {
         <Paper className={classes.innerContainer} square>
           {nickName === "AdMiN69" ? (
             <Link to="/addroom">
-              <img src={ipl} className={classes.iplLogo} />
+              <img src={ipl} alt="IPL" className={classes.iplLogo} />
             </Link>
           ) : (
-            <img src={ipl} className={classes.iplLogo} />
+            <img src={ipl} alt="IPL" className={classes.iplLogo} />
           )}
 
           <TextField
@@ -185,17 +185,16 @@ function JoinRoom() {
         </Paper>
       </Container>
       <div className={classes.imgContainer}>
-        <img src={rr} className={classes.teamImg1} />
-        <img src={csk} className={classes.teamImg2} />
-        <img src={rcb} className={classes.teamImg3} />
-        <img src={mi} className={classes.teamImg4} />
-        <img src={dc} className={classes.teamImg3} />
-        <img src={kxip} className={classes.teamImg2} />
-        <img src={kkr} className={classes.teamImg1} />
+        <img src={rr} alt="RR" className={classes.teamImg1} />
+        <img src={csk} alt="CSK" className={classes.teamImg2} />
+        <img src={rcb} alt="RCB" className={classes.teamImg3} />
+        <img src={mi} alt="MI" className={classes.teamImg4} />
+        <img src={dc} alt="DC" className={classes.teamImg3} />
+        <img src={kxip} alt="KXIP" className={classes.teamImg2} />
+        <img src={kkr} alt="KKR" className={classes.teamImg1} />
       </div>
     </div>
   );
 }
 
 export default JoinRoom;
-

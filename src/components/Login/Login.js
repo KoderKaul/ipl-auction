@@ -13,7 +13,6 @@ import firebase from "../../Firebase";
 import useStyles from "./Login.styles";
 import dora from "../../img/doralogo-white.png";
 import ipl from "../../img/ipl.png";
-import banner from "../../img/trophy.jpg";
 
 function Login() {
   const classes = useStyles();
@@ -26,10 +25,13 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (user.nickName === "") {
+      return;
+    }
     setShowLoading(true);
     ref
       .orderByChild("nickName")
-      .equalTo(user.nickName)
+      .equalTo(user.nickName.trim())
       .once("value", (snapshot) => {
         if (snapshot.exists()) {
           localStorage.setItem("nickName", user.nickName);
@@ -47,10 +49,22 @@ function Login() {
 
   return (
     <div className={classes.mainContainer}>
-      <Container component="main" maxWidth="xs">
+      <div className={classes.imgContainer}>
+        <img src={dora} alt="DORA" className={classes.doraImg} />
+      </div>
+      <Typography variant="h4" style={{ color: "#fff" }}>
+        Presents
+      </Typography>
+      <Typography variant="h2" style={{ color: "#fff" }}>
+        IPL
+      </Typography>
+      <Typography variant="h2" style={{ color: "#fff" }}>
+        Auction
+      </Typography>
+      <Container component="main" maxWidth="sm" style={{ width: "auto" }}>
         <Paper className={classes.innerContainer}>
-          <img src={ipl} className={classes.iplLogo} />
-          <Typography variant="h3">Join</Typography>
+          <img src={ipl} alt="ipl" className={classes.iplLogo} />
+          <Typography variant="h4">Join</Typography>
           <TextField
             label="Name"
             variant="outlined"
@@ -61,13 +75,13 @@ function Login() {
             onChange={(e) => {
               setUser({
                 ...user,
-                nickName: e.target.value,
+                nickName: e.target.value.replace(/^\s+|\s+$/g, ""),
               });
             }}
           />
 
           {showLoading ? (
-            <CircularProgress className={classes.submitButton}/>
+            <CircularProgress className={classes.submitButton} />
           ) : (
             <IconButton
               className={classes.submitButton}
@@ -79,18 +93,6 @@ function Login() {
           )}
         </Paper>
       </Container>
-      <div className={classes.imgContainer}>
-        <img src={dora} className={classes.doraImg} />
-      </div>
-      <Typography variant="h3" style={{ color: "#fff" }}>
-        Presents
-      </Typography>
-      <Typography variant="h1" style={{ color: "#fff" }}>
-        IPL
-      </Typography>
-      <Typography variant="h1" style={{ color: "#fff" }}>
-        Auction
-      </Typography>
     </div>
   );
 }

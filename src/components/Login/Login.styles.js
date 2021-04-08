@@ -9,7 +9,6 @@ export default makeStyles((theme) => ({
     height: "100%",
   },
   innerContainer: {
-    marginTop: theme.spacing(10),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
