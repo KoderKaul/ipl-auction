@@ -11,6 +11,7 @@ export default makeStyles((theme) => ({
   },
   innerContainer: {
     marginTop: theme.spacing(10),
+    paddingBottom: theme.spacing(4),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -31,6 +32,7 @@ export default makeStyles((theme) => ({
     alignItems: "flex-end",
     justifyContent: "center",
     width: "100%",
+    marginTop: theme.spacing(8)
   },
   teamImg1: {
     height: "300px",

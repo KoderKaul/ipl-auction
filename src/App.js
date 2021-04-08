@@ -6,7 +6,7 @@ import JoinRoom from "./components/JoinRoom/JoinRoom";
 import AddRoom from "./components/AddRoom";
 import ChatRoom from "./components/MainScreen/ChatRoom/ChatRoom";
 import useStyles from "./App.styles";
-import PlayersDisplay from "./components/PlayersDisplay";
+import PlayersDisplay from "./components/PlayerDisplay/PlayersDisplay";
 
 function App() {
   const classes = useStyles();

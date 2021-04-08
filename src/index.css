@@ -8,8 +8,8 @@ body {
   background-image: radial-gradient(circle at -40% -10%, #4f76f2, #0f1b41 60%);
   background-repeat: no-repeat;
   background-size: cover;
-  height: 100%;
-  overflow-y: "scroll";
+  height: 100vh;
+  color: #E5E5E5;
 }
 
 code {

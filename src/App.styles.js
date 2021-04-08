@@ -2,11 +2,11 @@ import { makeStyles } from "@material-ui/core";
 
 export default makeStyles((theme) => ({
   App: {
-    height: "100%",
+    height: "100vh",
     color: "white",
-    //     overflowY: "scroll",
-    //     "&::-webkit-scrollbar": {
-    //       display: "none",
-    //     },
+    overflowY: "scroll",
+    "&::-webkit-scrollbar": {
+      display: "none",
+    },
   },
 }));
