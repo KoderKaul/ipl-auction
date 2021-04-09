@@ -7,7 +7,8 @@ import AddRoom from "./components/AddRoom";
 import ChatRoom from "./components/MainScreen/ChatRoom/ChatRoom";
 import useStyles from "./App.styles";
 import PlayersDisplay from "./components/PlayerDisplay/PlayersDisplay";
-import AuctionPlayer from "./components/MainScreen/ChatRoom/AuctionRoom/AuctionPlayer";
+import AuctionRoom from "./components/AuctionRoom/AuctionRoom";
+import AuctioneerRoom from "./components/AuctionRoom/AuctioneerRoom";
 
 function App() {
   const classes = useStyles();
@@ -30,8 +31,11 @@ function App() {
           <Route path="/chatroom/:room">
             <ChatRoom />
           </Route>
-          <Route path="/auction">
-                  <AuctionPlayer/>
+          <Route path="/auctioneer/:room">
+            <AuctioneerRoom />
+          </Route>
+          <Route path="/auctionroom/:room">
+            <AuctionRoom />
           </Route>
         </Switch>
       </div>

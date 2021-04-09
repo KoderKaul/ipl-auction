@@ -101,7 +101,10 @@ function JoinRoom() {
         }
       });
 
-    history.push("/chatroom/" + myRoomname);
+    if (nickName === "AdMiN69") history.push("/auctioneer/" + myRoomname);
+    else {
+      history.push("/auctionroom/" + myRoomname);
+    }
   };
 
   const logout = () => {

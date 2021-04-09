@@ -24,7 +24,11 @@ export default makeStyles((theme) => ({
     height: "100%",
   },
   innerContainer: {
-    marginTop: theme.spacing(10),
+    height: "420px",
+    width: "260px",
+    marginTop: theme.spacing(2),
+    marginLeft: "20px",
+    marginRight: "20px",
     paddingBottom: theme.spacing(4),
     display: "flex",
     flexDirection: "column",
@@ -39,7 +43,5 @@ export default makeStyles((theme) => ({
       border: "none",
       zIndex: "10px",
     },
-    backgroundColor: "#000",
-    color: "#fff"
   },
 }));
