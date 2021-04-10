@@ -18,11 +18,25 @@ import { SendRenderPlayer } from "./SendRenderPlayer";
 function AuctioneerRoom() {
   const classes = useStyles();
   const [teamPlayers, setTeamPlayers] = useState([]);
-  const [currentPlayer, setCurrentPlayer] = useState("");
   const nick = localStorage.getItem("nickName");
   console.log(nick);
+  const username = localStorage.getItem("nickName");
   const { room } = useParams();
   const history = useHistory();
+
+  const [highestBidder,setHighestBidder] = useState("");
+  const [currentPlayer, setCurrentPlayer] = useState({
+    playerName: "",
+    basePrice: 0,
+    currentBid: 0,
+    image_url: "",
+    role: "",
+    teamName: "",
+    rating: "",
+    id: "",
+    soldTo: "",
+    status: "",
+  });
 
   const renderPlayers = async () => {
     firebase
@@ -52,6 +66,27 @@ function AuctioneerRoom() {
     return returnArr;
   };
 
+  const sendData = (e) => {
+      console.log("sending data")
+    e.preventDefault();
+    firebase
+      .database()
+      .ref("users/")
+      .orderByChild("nickName")
+      .equalTo(highestBidder)
+      .once("value", (snapshot) => {
+        let k = [];
+        k = snapshotToArray(snapshot);
+        const kk = k.find((x) => x.nickName === highestBidder);
+        k = kk.team != null ? kk.team : [];
+        console.log(currentPlayer)
+        k.push(currentPlayer);
+        console.log(k);
+        const userRef = firebase.database().ref("users/" + kk.key);
+        userRef.update({ team: k });
+      });
+  };
+
   useEffect(() => {
     renderPlayers();
     renderCurrentPlayer();
@@ -65,9 +100,35 @@ function AuctioneerRoom() {
         const crntRooms = snapshotToArray(snapshot);
         const crntRoom = crntRooms.find((x) => x.roomname === room);
         console.log(crntRoom.currentPlayer);
-        setCurrentPlayer(crntRoom.currentPlayer.playerName);
+        setCurrentPlayer({
+          playerName: crntRoom.currentPlayer.playerName,
+          basePrice: crntRoom.currentPlayer.basePrice,
+          currentBid: crntRoom.currentPlayer.currentBid,
+          image_url: crntRoom.currentPlayer.image_url,
+          role: crntRoom.currentPlayer.role,
+          teamName: crntRoom.currentPlayer.teamName,
+          rating: crntRoom.currentPlayer.rating,
+          soldTo: crntRoom.currentPlayer.soldTo,
+          status: crntRoom.currentPlayer.status,
+          id: crntRoom.currentPlayer.id,
+        });
       });
   };
+
+  const renderHighestBidder = () =>{
+      firebase
+      .database()
+      .ref("rooms/")
+      .on("value", (snapshot) =>{
+        let crntRooms = snapshotToArray(snapshot);
+        let crntRoom = crntRooms.find((x) => x.roomname === room);
+        setHighestBidder(crntRoom.highestBidder);
+      })
+  }
+
+  useEffect(() => {
+    renderHighestBidder();
+  }, []);
 
   const exitRoom = () => {
     history.goBack();
@@ -96,7 +157,7 @@ function AuctioneerRoom() {
           <Grid container direction="column">
             <Grid item className={classes.headingLul}>
               <div className={classes.heading}>
-                <Typography variant="h3">Remaining Purse: 50</Typography>
+              <Typography variant="h4">Highest Bidder: {highestBidder}</Typography>
               </div>
             </Grid>
             <Grid item xs={12}>
@@ -114,24 +175,33 @@ function AuctioneerRoom() {
                       imageHeight="180"
                       roundedColor="#000"
                       roundedSize="6"
+                      image={currentPlayer.image_url}
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant="h4" style={{ margin: "10px 0px" }}>
-                      {currentPlayer}
+                      {currentPlayer.playerName}
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography variant="h5">Role: </Typography>
+                    <Typography variant="h5">
+                      Role: {currentPlayer.role}
+                    </Typography>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography variant="h5">Rating:</Typography>
+                    <Typography variant="h5">
+                      Rating: {currentPlayer.rating}
+                    </Typography>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography variant="h5">Base Price:</Typography>
+                    <Typography variant="h5">
+                      Base Price: {currentPlayer.basePrice}
+                    </Typography>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography variant="h5">Current Bid: </Typography>
+                    <Typography variant="h5">
+                      Current Bid: {currentPlayer.currentBid}
+                    </Typography>
                   </Grid>
                 </Grid>
               </Paper>
@@ -140,22 +210,16 @@ function AuctioneerRoom() {
                   variant="contained"
                   color="primary"
                   style={{ margin: "10px 10px" }}
+                  onClick={sendData}
                 >
-                  Increase +5
+                  Sold
                 </Button>
                 <Button
                   variant="contained"
                   color="primary"
                   style={{ margin: "10px 10px" }}
                 >
-                  Increase +10
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{ margin: "10px 10px" }}
-                >
-                  Increase +15
+                  Skip
                 </Button>
               </div>
             </Grid>
@@ -165,7 +229,7 @@ function AuctioneerRoom() {
       <Grid item lg={6} className={classes.rightSide}>
         <Grid item className={classes.headingLul}>
           <div className={classes.heading}>
-            <Typography variant="h3">My Team</Typography>
+            <Typography variant="h3">All Players</Typography>
           </div>
         </Grid>
         <Grid container alignItems="center">

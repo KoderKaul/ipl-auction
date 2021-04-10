@@ -22,7 +22,6 @@ const sendPlayerData = (prop) => {
     .once("value", (snapshot) => {
       const k = snapshotToArray(snapshot);
       const room = k.find((x) => x.roomname === prop.room);
-
       const userRef = firebase.database().ref("rooms/" + room.key);
       userRef.update({ currentPlayer: prop.player, highestBidder: "none" });
     });

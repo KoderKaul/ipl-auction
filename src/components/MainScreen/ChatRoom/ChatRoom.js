@@ -4,9 +4,6 @@ import { Player } from "../../PlayerDisplay/PlayersDisplay";
 import {
   Typography,
   TextField,
-  IconButton,
-  Container,
-  Paper,
   Grid,
   AppBar,
   Toolbar,
@@ -79,21 +76,21 @@ function ChatRoom() {
   const renderPlayers = async () => {
     setNickname(localStorage.getItem("nickName"));
     console.log(nickname);
-  firebase
-    .database()
-    .ref("users/")
-    .orderByChild("nickName")
-    .equalTo(nick)
-    .on("value", (snapshot) => {
-      setTeamPlayers([]);
-      const players = snapshotToArray(snapshot);
-      //setTeamPlayers(players.team);
-      console.log(players);
-      const playa = players.find((x) => x.nickName === nick)
-      const team = playa.team != null ? playa.team : [];
+    firebase
+      .database()
+      .ref("users/")
+      .orderByChild("nickName")
+      .equalTo(nick)
+      .on("value", (snapshot) => {
+        setTeamPlayers([]);
+        const players = snapshotToArray(snapshot);
+        //setTeamPlayers(players.team);
+        console.log(players);
+        const playa = players.find((x) => x.nickName === nick);
+        const team = playa.team != null ? playa.team : [];
         setTeamPlayers(team);
-    });
-};
+      });
+  };
 
   useEffect(() => {
     renderPlayers();
@@ -176,18 +173,20 @@ function ChatRoom() {
   };
 
   const changeCurrentPlayer = () => {
-    firebase.database().ref("rooms/")
-    .orderByChild("roomname")
-    .equalTo(roomname)
-    .once("value", (snapshot) => {
+    firebase
+      .database()
+      .ref("rooms/")
+      .orderByChild("roomname")
+      .equalTo(roomname)
+      .once("value", (snapshot) => {
         const lm = snapshotToArray(snapshot);
-        const currentRoom = lm.find((x) => x.roomname === roomname)
+        const currentRoom = lm.find((x) => x.roomname === roomname);
         console.log(currentRoom.key);
         const roomRef = firebase.database().ref("rooms/" + currentRoom.key);
-        roomRef.update({currentPlayer: currentPlayer});
-    })
-  }
-  
+        roomRef.update({ currentPlayer: currentPlayer });
+      });
+  };
+
   return (
     <Grid container>
       <AppBar position="static">
@@ -206,22 +205,20 @@ function ChatRoom() {
       </AppBar>
       <Grid item xs={6}>
         <TextField
-            value={currentPlayer}
-            onChange={
-                (e)=>{
-                    setCurrentPlayer(e.target.value);
-                }
-            }
+          value={currentPlayer}
+          onChange={(e) => {
+            setCurrentPlayer(e.target.value);
+          }}
         />
         <Button
-            color="primary"
-            variant="contained"
-            fullWidth
-            className={classes.submitButton}
-            onClick={changeCurrentPlayer}
-          >
-            Join
-          </Button>
+          color="primary"
+          variant="contained"
+          fullWidth
+          className={classes.submitButton}
+          onClick={changeCurrentPlayer}
+        >
+          Join
+        </Button>
       </Grid>
       <Grid item xs={6}>
         <Grid container direction="column">
@@ -243,13 +240,13 @@ function ChatRoom() {
             </form>
           </Grid>
           <Grid item direction="row">
-          {teamPlayers.map((player, index) => {
-            return (
-              <Grid item xs={2}>
-                <Player key={index} player={player} />
-              </Grid>
-            );
-          })}
+            {teamPlayers.map((player, index) => {
+              return (
+                <Grid item xs={2}>
+                  <Player key={index} player={player} />
+                </Grid>
+              );
+            })}
           </Grid>
         </Grid>
       </Grid>
