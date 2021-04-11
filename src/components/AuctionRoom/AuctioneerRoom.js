@@ -9,7 +9,6 @@ import {
 } from "@material-ui/core";
 import ReactRoundedImage from "react-rounded-image";
 import useStyles from "./AuctionRoom.styles";
-import { Player } from "../PlayerDisplay/PlayersDisplay";
 import firebase from "../../Firebase";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { useHistory, useParams } from "react-router-dom";
@@ -20,11 +19,10 @@ function AuctioneerRoom() {
   const [teamPlayers, setTeamPlayers] = useState([]);
   const nick = localStorage.getItem("nickName");
   console.log(nick);
-  const username = localStorage.getItem("nickName");
   const { room } = useParams();
   const history = useHistory();
 
-  const [highestBidder,setHighestBidder] = useState("");
+  const [highestBidder, setHighestBidder] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState({
     playerName: "",
     basePrice: 0,
@@ -34,8 +32,7 @@ function AuctioneerRoom() {
     teamName: "",
     rating: "",
     id: "",
-    soldTo: "",
-    status: "",
+    teamColor: "",
   });
 
   const renderPlayers = async () => {
@@ -44,7 +41,7 @@ function AuctioneerRoom() {
       .ref("rooms/")
       .orderByChild("roomname")
       .equalTo(room)
-      .on("value", (snapshot) => {
+      .once("value", (snapshot) => {
         setTeamPlayers([]);
         console.log(room);
         const players = snapshotToArray(snapshot);
@@ -67,8 +64,9 @@ function AuctioneerRoom() {
   };
 
   const sendData = (e) => {
-      console.log("sending data")
+    console.log("sending data");
     e.preventDefault();
+    if (highestBidder === "none") return;
     firebase
       .database()
       .ref("users/")
@@ -79,17 +77,38 @@ function AuctioneerRoom() {
         k = snapshotToArray(snapshot);
         const kk = k.find((x) => x.nickName === highestBidder);
         k = kk.team != null ? kk.team : [];
-        console.log(currentPlayer)
         k.push(currentPlayer);
-        console.log(k);
         const userRef = firebase.database().ref("users/" + kk.key);
-        userRef.update({ team: k });
+        userRef.update({
+          team: k,
+          wallet: kk.wallet - currentPlayer.currentBid,
+        });
       });
+    firebase
+      .database()
+      .ref("rooms/")
+      .once("value", (snapshot) => {
+        let crntRooms = snapshotToArray(snapshot);
+        let crntRoom = crntRooms.find((x) => x.roomname === room);
+        const playId = currentPlayer.id - 1;
+        const playRef = firebase
+          .database()
+          .ref("rooms/" + crntRoom.key + "/players/0/" + playId);
+        playRef.remove();
+        const curRef = firebase.database().ref("rooms/" + crntRoom.key);
+        curRef.update({
+          currentPlayer: { playerName: "none" },
+          highestBidder: "none",
+        });
+      });
+    renderPlayers();
   };
+  useEffect(() => {
+    renderCurrentPlayer();
+  }, []);
 
   useEffect(() => {
     renderPlayers();
-    renderCurrentPlayer();
   }, []);
 
   const renderCurrentPlayer = async () => {
@@ -108,23 +127,22 @@ function AuctioneerRoom() {
           role: crntRoom.currentPlayer.role,
           teamName: crntRoom.currentPlayer.teamName,
           rating: crntRoom.currentPlayer.rating,
-          soldTo: crntRoom.currentPlayer.soldTo,
-          status: crntRoom.currentPlayer.status,
           id: crntRoom.currentPlayer.id,
+          teamColor: crntRoom.currentPlayer.teamColor,
         });
       });
   };
 
-  const renderHighestBidder = () =>{
-      firebase
+  const renderHighestBidder = () => {
+    firebase
       .database()
       .ref("rooms/")
-      .on("value", (snapshot) =>{
+      .on("value", (snapshot) => {
         let crntRooms = snapshotToArray(snapshot);
         let crntRoom = crntRooms.find((x) => x.roomname === room);
         setHighestBidder(crntRoom.highestBidder);
-      })
-  }
+      });
+  };
 
   useEffect(() => {
     renderHighestBidder();
@@ -139,7 +157,7 @@ function AuctioneerRoom() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            Welcome {nick} to IPL Auction Presented by DORA
+            Welcome {nick} to IPL Auction Presented by DoRA
           </Typography>
           <Button
             color="inherit"
@@ -150,92 +168,124 @@ function AuctioneerRoom() {
           </Button>
         </Toolbar>
       </AppBar>
-      <Grid item lg={6} className={classes.leftSide}>
-        {currentPlayer === "none" ? (
-          <Typography variant="h2">Auction Not Started</Typography>
-        ) : (
-          <Grid container direction="column">
-            <Grid item className={classes.headingLul}>
-              <div className={classes.heading}>
-              <Typography variant="h4">Highest Bidder: {highestBidder}</Typography>
-              </div>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper className={classes.innerContainer}>
-                <Grid
-                  container
-                  direction="column"
-                  justify="center"
-                  spacing={2}
-                  alignItems="center"
-                >
-                  <Grid item xs={12}>
-                    <ReactRoundedImage
-                      imageWidth="180"
-                      imageHeight="180"
-                      roundedColor="#000"
-                      roundedSize="6"
-                      image={currentPlayer.image_url}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h4" style={{ margin: "10px 0px" }}>
-                      {currentPlayer.playerName}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h5">
-                      Role: {currentPlayer.role}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h5">
-                      Rating: {currentPlayer.rating}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h5">
-                      Base Price: {currentPlayer.basePrice}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h5">
-                      Current Bid: {currentPlayer.currentBid}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Paper>
-              <div className={classes.buttons}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{ margin: "10px 10px" }}
-                  onClick={sendData}
-                >
-                  Sold
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{ margin: "10px 10px" }}
-                >
-                  Skip
-                </Button>
-              </div>
-            </Grid>
+      <Grid
+        item
+        lg={5}
+        xs={12}
+        direction="column"
+        alignItems="center"
+        justify="center"
+      >
+        <Grid container direction="column" alignItems="center">
+          <Grid item xs={12}>
+            <Typography
+              variant="h4"
+              style={{
+                marginTop: "30px",
+                border: "medium solid",
+                borderRadius: "3px",
+                padding: "5px",
+                fontFamily: "Zilla Slab Highlight, cursive",
+                backgroundColor: "#ff7600",
+              }}
+            >
+              Current Bid: {currentPlayer.currentBid}
+            </Typography>
           </Grid>
-        )}
-      </Grid>
-      <Grid item lg={6} className={classes.rightSide}>
-        <Grid item className={classes.headingLul}>
-          <div className={classes.heading}>
-            <Typography variant="h3">All Players</Typography>
+
+          <Grid item xs={12}>
+            <Typography
+              variant="h4"
+              style={{
+                marginTop: "30px",
+                border: "medium solid",
+                borderRadius: "3px",
+                padding: "5px",
+                fontFamily: "Zilla Slab Highlight, cursive",
+                backgroundColor: "#ff005c",
+              }}
+            >
+              Highest Bidder: {highestBidder === "none" ? "" : highestBidder}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Paper className={classes.innerContainer}>
+              <Grid
+                container
+                direction="column"
+                justify="center"
+                spacing={2}
+                alignItems="center"
+              >
+                <Grid item xs={12}>
+                  <ReactRoundedImage
+                    imageWidth="250"
+                    imageHeight="250"
+                    roundedColor={currentPlayer.teamColor}
+                    roundedSize="6"
+                    image={currentPlayer.image_url}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="h4" style={{ margin: "10px 0px" }}>
+                    {currentPlayer.playerName}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="h5">
+                    Role: {currentPlayer.role}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="h5">
+                    Rating: {currentPlayer.rating}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="h5">
+                    Base Price: {currentPlayer.basePrice}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Grid>
+          <div className={classes.buttons}>
+            <Button
+              variant="contained"
+              color="secondary"
+              style={{
+                margin: "10px 10px",
+                padding: "10px  25px 10px 25px",
+                backgroundColor: "red",
+                fontWeight: "bold",
+              }}
+              onClick={sendData}
+              size="large"
+            >
+              SOLD!!!
+            </Button>
           </div>
         </Grid>
-        <Grid container alignItems="center">
-          {teamPlayers.map((player, index) => {
-            return <SendRenderPlayer key={index} player={player} room={room} />;
-          })}
+      </Grid>
+      <Grid item lg={7} className={classes.rightSide}>
+        <Grid item className={classes.headingLul}>
+          <Typography variant="h3">All Players</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Grid container alignItems="center">
+            {teamPlayers.map((player, index) => {
+              return (
+                <Grid item lg={4} md={4} sm={6} xs={12} spacing={2}>
+                  <SendRenderPlayer
+                    key={index}
+                    player={player}
+                    room={room}
+                    teamColor={player.teamColor}
+                  />
+                </Grid>
+              );
+            })}
+          </Grid>
         </Grid>
       </Grid>
     </Grid>

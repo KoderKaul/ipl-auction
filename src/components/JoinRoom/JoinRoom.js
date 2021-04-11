@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
-import Moment from "moment";
 import firebase from "../../Firebase";
 import useStyles from "./JoinRoom.styles";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
@@ -24,13 +23,12 @@ import mi from "../../img/mi.jpg";
 import kxip from "../../img/kxip.jpg";
 import dc from "../../img/dc.jpg";
 import kkr from "../../img/kkr.jpg";
-import ipl from "../../img/ipl.png";
+import ipl from "../../img/IPL-logo2.png";
 
 function JoinRoom() {
   const classes = useStyles();
   const [myRoom, setMyRoom] = useState("");
   const [rooms, setRooms] = useState([]);
-  const [showLoading, setShowLoading] = useState(true);
   const [nickName, setNickName] = useState("");
   const history = useHistory();
   const [open, setOpen] = useState(false);
@@ -44,7 +42,6 @@ function JoinRoom() {
         .on("value", (resp) => {
           setRooms([]);
           setRooms(snapshotToArray(resp));
-          setShowLoading(false);
         });
     };
 
@@ -64,44 +61,25 @@ function JoinRoom() {
   };
 
   const enterChatmyRoom = (myRoomname) => {
-    const chat = {
-      roomname: "",
-      nickname: "",
-      message: "",
-      date: "",
-      type: "",
-    };
-    chat.roomname = myRoomname;
-    chat.nickname = nickName;
-    chat.date = Moment(new Date()).format("DD/MM/YYYY HH:mm:ss");
-    chat.message = `${nickName} enter the room`;
-    chat.type = "join";
-    const newMessage = firebase.database().ref("chats/").push();
-    newMessage.set(chat);
-
     firebase
       .database()
       .ref("roomusers/")
       .orderByChild("roomname")
       .equalTo(myRoomname)
-      .on("value", (resp) => {
+      .once("value", (resp) => {
         let roomuser = [];
         roomuser = snapshotToArray(resp);
         const user = roomuser.find((x) => x.nickname === nickName);
         if (user !== undefined) {
-          const userRef = firebase.database().ref("roomusers/" + user.key);
-          userRef.update({ status: "online" });
         } else {
-          const newroomuser = { roomname: "", nickname: "", status: "" };
+          const newroomuser = { roomname: "", nickname: "", wallet: 1000 };
           newroomuser.roomname = myRoomname;
           newroomuser.nickname = nickName;
-          newroomuser.status = "online";
           const newRoomUser = firebase.database().ref("roomusers/").push();
           newRoomUser.set(newroomuser);
         }
       });
-
-    if (nickName === "AdMiN69") history.push("/auctioneer/" + myRoomname);
+    if (nickName === "Admin") history.push("/auctioneer/" + myRoomname);
     else {
       history.push("/auctionroom/" + myRoomname);
     }
@@ -128,7 +106,7 @@ function JoinRoom() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            Welcome {nickName} to IPL Auction Presented by DORA
+            Welcome {nickName} to IPL Auction Presented by DoRA
           </Typography>
           <Button color="inherit" onClick={logout} endIcon={<ExitToAppIcon />}>
             Logout
@@ -137,7 +115,7 @@ function JoinRoom() {
       </AppBar>
       <Container component="main" maxWidth="xs">
         <Paper className={classes.innerContainer} square>
-          {nickName === "AdMiN69" ? (
+          {nickName === "Admin" ? (
             <Link to="/addroom">
               <img src={ipl} alt="IPL" className={classes.iplLogo} />
             </Link>

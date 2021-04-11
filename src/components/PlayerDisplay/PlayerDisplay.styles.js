@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core";
 export default makeStyles((theme) => ({
   rowTitle: {
     color: "#E5E5E5",
-    fontWeight: "800",
+    fontWeight: "1000",
     letterSpacing: "1.5px",
     marginBottom: "-10px",
     marginLeft: "30px",
@@ -24,8 +24,7 @@ export default makeStyles((theme) => ({
     height: "100%",
   },
   innerContainer: {
-    height: "420px",
-    width: "260px",
+    minWidth: "215px",
     marginTop: theme.spacing(2),
     marginLeft: "20px",
     marginRight: "20px",
@@ -39,9 +38,12 @@ export default makeStyles((theme) => ({
     padding: "10px",
     transition: "transform 650ms",
     "&:hover": {
-      transform: "scale(1.09)",
+      transform: "scale(1.05)",
       border: "none",
       zIndex: "10px",
+    },
+    title: {
+      flexGrow: 1,
     },
   },
 }));

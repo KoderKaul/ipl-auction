@@ -12,7 +12,7 @@ import {
 import firebase from "../../Firebase";
 import useStyles from "./Login.styles";
 import dora from "../../img/doralogo-white.png";
-import ipl from "../../img/ipl.png";
+import ipl from "../../img/IPL-logo2.png";
 
 function Login() {
   const classes = useStyles();
@@ -20,7 +20,8 @@ function Login() {
   const [showLoading, setShowLoading] = useState(false);
   const [user, setUser] = useState({
     nickName: "",
-    wallet: 800,
+    wallet: 1000,
+    totalRating: 0,
   });
   const ref = firebase.database().ref("users/");
 

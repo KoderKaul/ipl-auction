@@ -28,6 +28,7 @@ export default makeStyles((theme) => ({
     width: "100%",
   },
   doraImg: {
+    marginTop: "100px",
     height: "250px",
   },
   iplLogo: {

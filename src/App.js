@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Login from "./components/Login/Login";
 import JoinRoom from "./components/JoinRoom/JoinRoom";
 import AddRoom from "./components/AddRoom";
-import ChatRoom from "./components/MainScreen/ChatRoom/ChatRoom";
 import useStyles from "./App.styles";
 import PlayersDisplay from "./components/PlayerDisplay/PlayersDisplay";
 import AuctionRoom from "./components/AuctionRoom/AuctionRoom";
@@ -27,9 +26,6 @@ function App() {
           </Route>
           <Route path="/addroom">
             <AddRoom />
-          </Route>
-          <Route path="/chatroom/:room">
-            <ChatRoom />
           </Route>
           <Route path="/auctioneer/:room">
             <AuctioneerRoom />

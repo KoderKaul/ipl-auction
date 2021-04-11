@@ -20,7 +20,6 @@ function AddRoom() {
     players: [Players],
     currentPlayer: { playerName: "none" },
     highestBidder: "none",
-    numberOfUsers: 0,
   });
   const [showLoading, setShowLoading] = useState(false);
   const ref = firebase.database().ref("rooms/");

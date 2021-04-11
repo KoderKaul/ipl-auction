@@ -2,30 +2,25 @@ import { makeStyles } from "@material-ui/core";
 
 export default makeStyles((theme) => ({
   innerContainer: {
-    height: "480px",
-    width: "400px",
-    margin: "100px",
-    marginLeft: "200px",
     borderRadius: "10px",
+    marginTop: theme.spacing(6),
+    padding: theme.spacing(4),
+    minWidth: "350px",
   },
   heading: {
     display: "flex",
     flexGrow: 1,
   },
   outerContainer: {
-      display: "flex",
-      flexDirection: "column"
+    display: "flex",
+    flexDirection: "column",
   },
-  buttons:{
-      display: "flex",
-      flexDirection: "row",
-      marginLeft: "200px"
-  },
-  headingLul:{
-      display: "flex",
-      flexGrow: 1,
-      alignItems: "center",
-      justifyContent: "center"
+  headingLul: {
+    display: "flex",
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: "20px",
   },
   rightSide: {
     overflowY: "scroll",
@@ -35,5 +30,9 @@ export default makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+  },
+  fav: {
+    margin: theme.spacing(2),
+    padding: theme.spacing(6),
   },
 }));
