@@ -13,12 +13,57 @@ import firebase from "../../Firebase";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { useHistory, useParams } from "react-router-dom";
 import { SendRenderPlayer } from "./SendRenderPlayer";
+import img from "../../img/placeholder2.png";
+
+// Table Code
+import { withStyles, makeStyles } from "@material-ui/core/styles";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Slide from "@material-ui/core/Slide";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+const StyledTableCell = withStyles((theme) => ({
+  head: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  body: {
+    fontSize: 16,
+  },
+}))(TableCell);
+
+const StyledTableRow = withStyles((theme) => ({
+  root: {
+    "&:nth-of-type(odd)": {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+}))(TableRow);
+
+const useStylez = makeStyles({
+  table: {
+    minWidth: 500,
+  },
+});
+
+// Table Code End
 
 function AuctioneerRoom() {
   const classes = useStyles();
   const [teamPlayers, setTeamPlayers] = useState([]);
   const nick = localStorage.getItem("nickName");
-  console.log(nick);
+  const username = localStorage.getItem("nickName");
   const { room } = useParams();
   const history = useHistory();
 
@@ -43,11 +88,13 @@ function AuctioneerRoom() {
       .equalTo(room)
       .once("value", (snapshot) => {
         setTeamPlayers([]);
-        console.log(room);
+        // console.log(room);
         const players = snapshotToArray(snapshot);
-        //setTeamPlayers(players.team);
+        // console.log(players);
         const playa = players.find((x) => x.roomname === room);
+        // console.log(players);
         const team = playa.players != null ? playa.players : [];
+        // console.log(team[0]);
         setTeamPlayers(team[0]);
       });
   };
@@ -64,7 +111,7 @@ function AuctioneerRoom() {
   };
 
   const sendData = (e) => {
-    console.log("sending data");
+    //     console.log("sending data");
     e.preventDefault();
     if (highestBidder === "none") return;
     firebase
@@ -84,6 +131,22 @@ function AuctioneerRoom() {
           wallet: kk.wallet - currentPlayer.currentBid,
         });
       });
+
+    firebase
+      .database()
+      .ref("roomusers/")
+      .orderByChild("nickname")
+      .equalTo(highestBidder)
+      .once("value", (snapshot) => {
+        let k = [];
+        k = snapshotToArray(snapshot);
+        const kk = k.find((x) => x.nickname === highestBidder);
+        const roomUserRef = firebase.database().ref("roomusers/" + kk.key);
+        roomUserRef.update({
+          wallet: kk.wallet - currentPlayer.currentBid,
+        });
+      });
+
     firebase
       .database()
       .ref("rooms/")
@@ -94,7 +157,9 @@ function AuctioneerRoom() {
         const playRef = firebase
           .database()
           .ref("rooms/" + crntRoom.key + "/players/0/" + playId);
-        playRef.remove();
+        playRef.update({
+          status: "sold",
+        });
         const curRef = firebase.database().ref("rooms/" + crntRoom.key);
         curRef.update({
           currentPlayer: { playerName: "none" },
@@ -118,7 +183,7 @@ function AuctioneerRoom() {
       .on("value", (snapshot) => {
         const crntRooms = snapshotToArray(snapshot);
         const crntRoom = crntRooms.find((x) => x.roomname === room);
-        console.log(crntRoom.currentPlayer);
+        // console.log(crntRoom.currentPlayer);
         setCurrentPlayer({
           playerName: crntRoom.currentPlayer.playerName,
           basePrice: crntRoom.currentPlayer.basePrice,
@@ -183,9 +248,8 @@ function AuctioneerRoom() {
               style={{
                 marginTop: "30px",
                 border: "medium solid",
-                borderRadius: "3px",
-                padding: "5px",
-                fontFamily: "Zilla Slab Highlight, cursive",
+                borderRadius: "35px",
+                padding: "10px",
                 backgroundColor: "#ff7600",
               }}
             >
@@ -199,9 +263,8 @@ function AuctioneerRoom() {
               style={{
                 marginTop: "30px",
                 border: "medium solid",
-                borderRadius: "3px",
-                padding: "5px",
-                fontFamily: "Zilla Slab Highlight, cursive",
+                borderRadius: "35px",
+                padding: "10px",
                 backgroundColor: "#ff005c",
               }}
             >
@@ -223,7 +286,11 @@ function AuctioneerRoom() {
                     imageHeight="250"
                     roundedColor={currentPlayer.teamColor}
                     roundedSize="6"
-                    image={currentPlayer.image_url}
+                    image={
+                      currentPlayer.image_url !== undefined
+                        ? currentPlayer.image_url
+                        : img
+                    }
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -266,6 +333,9 @@ function AuctioneerRoom() {
             </Button>
           </div>
         </Grid>
+        <div style={{ margin: "50px" }}>
+          <CustomizedTables room={room} />
+        </div>
       </Grid>
       <Grid item lg={7} className={classes.rightSide}>
         <Grid item className={classes.headingLul}>
@@ -273,18 +343,20 @@ function AuctioneerRoom() {
         </Grid>
         <Grid item xs={12}>
           <Grid container alignItems="center">
-            {teamPlayers.map((player, index) => {
-              return (
-                <Grid item lg={4} md={4} sm={6} xs={12} spacing={2}>
-                  <SendRenderPlayer
-                    key={index}
-                    player={player}
-                    room={room}
-                    teamColor={player.teamColor}
-                  />
-                </Grid>
-              );
-            })}
+            {teamPlayers
+              .filter((player) => player.status != "sold")
+              .map((player, index) => {
+                return (
+                  <Grid item lg={4} md={4} sm={6} xs={12} spacing={2}>
+                    <SendRenderPlayer
+                      key={index}
+                      player={player}
+                      room={room}
+                      teamColor={player.teamColor}
+                    />
+                  </Grid>
+                );
+              })}
           </Grid>
         </Grid>
       </Grid>
@@ -293,3 +365,133 @@ function AuctioneerRoom() {
 }
 
 export default AuctioneerRoom;
+
+function CustomizedTables(prop) {
+  const classes = useStylez();
+  const thisRoom = prop.room;
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const handleClickOpen = (namer) => {
+    //     console.log("1", namer);
+    setName(namer);
+    //     console.log("11", name);
+    setOpen(true);
+  };
+
+  const handleClose = (condition) => {
+    //     console.log("2", name);
+    if (condition == "yes" && name != "") {
+      firebase
+        .database()
+        .ref("users/")
+        .orderByChild("nickName")
+        .equalTo(name)
+        .once("value", (snapshot) => {
+          var array = snapshotToArray(snapshot);
+          const kk = array.find((x) => x.nickName === name);
+          const roomUserRef = firebase.database().ref("users/" + kk.key);
+          //   console.log(roomUserRef);
+          roomUserRef.update({
+            wallet: 0,
+          });
+        });
+      firebase
+        .database()
+        .ref("roomusers/")
+        .orderByChild("nickname")
+        .equalTo(name)
+        .once("value", (snapshot) => {
+          var array = snapshotToArray(snapshot);
+          const kk = array.find((x) => x.nickname === name);
+          const roomUserRef = firebase.database().ref("roomusers/" + kk.key);
+          //   console.log(roomUserRef);
+          roomUserRef.update({
+            wallet: 0,
+          });
+        });
+    }
+    setName("");
+    setOpen(false);
+  };
+  const [roomData, setRoomData] = useState([]);
+
+  const renderRoomData = () => {
+    firebase
+      .database()
+      .ref("roomusers/")
+      .orderByChild("roomname")
+      .equalTo(thisRoom)
+      .on("value", (snapshot) => {
+        setRoomData([]);
+        const roomUsers = snapshotToArray(snapshot);
+        setRoomData(roomUsers);
+      });
+  };
+  const snapshotToArray = (snapshot) => {
+    const returnArr = [];
+
+    snapshot.forEach((childSnapshot) => {
+      const item = childSnapshot.val();
+      item.key = childSnapshot.key;
+      returnArr.push(item);
+    });
+
+    return returnArr;
+  };
+
+  useEffect(() => {
+    renderRoomData();
+  }, []);
+
+  return (
+    <TableContainer component={Paper}>
+      <Table className={classes.table} aria-label="customized table">
+        <TableHead>
+          <TableRow>
+            <StyledTableCell>PlayerName</StyledTableCell>
+            <StyledTableCell align="right">Remaining Budget</StyledTableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {roomData.map((data) => (
+            <StyledTableRow key={data.nickname}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+                onClick={() => handleClickOpen(data.nickname)}
+              >
+                {data.nickname}
+              </StyledTableCell>
+              <StyledTableCell align="right">{data.wallet}</StyledTableCell>
+            </StyledTableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <Dialog
+        open={open}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">
+          {"Do you want to kick"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Its makes their wallet = 0 !
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleClose("no")} color="primary">
+            No
+          </Button>
+          <Button onClick={() => handleClose("yes")} color="primary">
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </TableContainer>
+  );
+}

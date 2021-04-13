@@ -16,7 +16,45 @@ import { useHistory, useParams, NavLink } from "react-router-dom";
 import { Fab } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import img from "../../img/placeholder2.png";
-function AuctionRoom() {
+
+// Table Code
+import { withStyles, makeStyles } from "@material-ui/core/styles";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+
+const StyledTableCell = withStyles((theme) => ({
+  head: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  body: {
+    fontSize: 14,
+  },
+}))(TableCell);
+
+const StyledTableRow = withStyles((theme) => ({
+  root: {
+    "&:nth-of-type(odd)": {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+}))(TableRow);
+
+const useStylez = makeStyles({
+  table: {
+    minWidth: 500,
+  },
+  paper: {
+    width: "100%",
+  },
+});
+
+// Table Code End
+export default function AuctionRoom() {
   const classes = useStyles();
   const [teamPlayers, setTeamPlayers] = useState([]);
   const [currentPlayer, setCurrentPlayer] = useState({
@@ -35,6 +73,7 @@ function AuctionRoom() {
   const nick = localStorage.getItem("nickName");
   const { room } = useParams();
   const history = useHistory();
+
   const renderHighestBidder = () => {
     firebase
       .database()
@@ -127,6 +166,10 @@ function AuctionRoom() {
       alert("Insufficent Balance!");
       return;
     }
+    if (bidval == 0 && currentPlayer.currentBid !== currentPlayer.basePrice) {
+      alert("Bid above Base price");
+      return;
+    }
     firebase
       .database()
       .ref("rooms/")
@@ -172,17 +215,28 @@ function AuctionRoom() {
           </Button>
         </Toolbar>
       </AppBar>
-      <Grid item lg={5} xs={12}>
-        <Grid container direction="column" alignItems="center">
+      <Grid
+        item
+        lg={5}
+        xs={12}
+        direction="column"
+        alignItems="center"
+        justify="center"
+      >
+        <Grid
+          container
+          direction="column"
+          alignItems="center"
+          justify="flex-start"
+        >
           <Grid item className={classes.headingLul}>
             <Typography
               variant="h4"
               style={{
                 marginTop: "30px",
                 border: "medium solid",
-                borderRadius: "3px",
-                padding: "5px",
-                fontFamily: "Zilla Slab Highlight, cursive",
+                borderRadius: "35px",
+                padding: "10px",
                 backgroundColor: "#ff7600",
               }}
             >
@@ -195,9 +249,8 @@ function AuctionRoom() {
               style={{
                 marginTop: "30px",
                 border: "medium solid",
-                borderRadius: "3px",
+                borderRadius: "35px",
                 padding: "5px",
-                fontFamily: "Zilla Slab Highlight, cursive",
                 backgroundColor: "#ff7600",
               }}
             >
@@ -211,13 +264,17 @@ function AuctionRoom() {
               style={{
                 marginTop: "30px",
                 border: "medium solid",
-                borderRadius: "3px",
-                padding: "5px",
-                fontFamily: "Zilla Slab Highlight, cursive",
+                borderRadius: "35px",
+                padding: "10px",
                 backgroundColor: "#ff005c",
               }}
             >
-              Highest Bidder: {highestBidder === "none" ? "" : highestBidder}
+              Highest Bidder:{" "}
+              {highestBidder === "none"
+                ? ""
+                : highestBidder.lastIndexOf("@#@") != -1
+                ? highestBidder.substr(highestBidder.lastIndexOf("@#@") + 3)
+                : highestBidder}
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -265,6 +322,14 @@ function AuctionRoom() {
               </Grid>
             </Paper>
           </Grid>
+          <Fab
+            color="secondary"
+            className={classes.fav}
+            onClick={() => changeBid(0)}
+            variant="extended"
+          >
+            <Typography variant="h5">Buy AT Base</Typography>
+          </Fab>
           <div className={classes.buttons}>
             <Fab
               color="secondary"
@@ -292,6 +357,9 @@ function AuctionRoom() {
             </Fab>
           </div>
         </Grid>
+        <div style={{ margin: "50px" }}>
+          <CustomizedTables room={room} />
+        </div>
       </Grid>
       <Grid item lg={7} className={classes.rightSide}>
         <Grid item className={classes.headingLul}>
@@ -300,8 +368,8 @@ function AuctionRoom() {
         <Grid container alignItems="center">
           {teamPlayers.map((player, index) => {
             return (
-              <Grid key={index} item lg={4} md={6} xs={12}>
-                <Player player={player} />
+              <Grid item lg={4} md={6} xs={12}>
+                <Player key={index} player={player} />
               </Grid>
             );
           })}
@@ -310,6 +378,76 @@ function AuctionRoom() {
     </Grid>
   );
 }
+
+function CustomizedTables(prop) {
+  const classes = useStylez();
+  const thisRoom = prop.room;
+  const rows = [];
+
+  const [roomData, setRoomData] = useState([]);
+
+  const renderRoomData = () => {
+    firebase
+      .database()
+      .ref("roomusers/")
+      .orderByChild("roomname")
+      .equalTo(thisRoom)
+      .on("value", (snapshot) => {
+        setRoomData([]);
+        const roomUsers = snapshotToArray(snapshot);
+        // console.log(roomUsers);
+        setRoomData(roomUsers);
+      });
+  };
+
+  const snapshotToArray = (snapshot) => {
+    const returnArr = [];
+
+    snapshot.forEach((childSnapshot) => {
+      const item = childSnapshot.val();
+      item.key = childSnapshot.key;
+      returnArr.push(item);
+    });
+
+    return returnArr;
+  };
+
+  useEffect(() => {
+    renderRoomData();
+  }, []);
+
+  return (
+    <TableContainer component={Paper} className={classes.paper}>
+      <Table className={classes.table} aria-label="customized table">
+        <TableHead>
+          <TableRow>
+            <StyledTableCell>PlayerName</StyledTableCell>
+            <StyledTableCell align="right">Remaining Budget</StyledTableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {roomData
+            .filter((data) => data.nickname != "###Admin@@@")
+            .map((data) => {
+              return (
+                <StyledTableRow key={data.nickname}>
+                  <StyledTableCell component="th" scope="row">
+                    {data.nickname.lastIndexOf("@#@") != -1
+                      ? data.nickname.substr(
+                          data.nickname.lastIndexOf("@#@") + 3
+                        )
+                      : data.nickname}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">{data.wallet}</StyledTableCell>
+                </StyledTableRow>
+              );
+            })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
 const Player = (prop) => {
   const classes = usseStyles();
   const mySentence =
@@ -365,4 +503,3 @@ const Player = (prop) => {
     </div>
   );
 };
-export default AuctionRoom;

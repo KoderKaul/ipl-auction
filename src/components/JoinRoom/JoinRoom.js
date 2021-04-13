@@ -59,7 +59,15 @@ function JoinRoom() {
 
     return returnArr;
   };
-
+  const [full, setFull] = useState(false);
+  const nextPage = (myRoomname) => {
+    if (!full) {
+      if (nickName === "###Admin@@@") history.push("/auctioneer/" + myRoomname);
+      else {
+        history.push("/auctionroom/" + myRoomname);
+      }
+    } else return;
+  };
   const enterChatmyRoom = (myRoomname) => {
     firebase
       .database()
@@ -70,19 +78,21 @@ function JoinRoom() {
         let roomuser = [];
         roomuser = snapshotToArray(resp);
         const user = roomuser.find((x) => x.nickname === nickName);
-        if (user !== undefined) {
-        } else {
-          const newroomuser = { roomname: "", nickname: "", wallet: 1000 };
-          newroomuser.roomname = myRoomname;
-          newroomuser.nickname = nickName;
-          const newRoomUser = firebase.database().ref("roomusers/").push();
-          newRoomUser.set(newroomuser);
+        if (user == undefined) {
+          if (roomuser.length < 10) {
+            const newroomuser = { roomname: "", nickname: "", wallet: 1000 };
+            newroomuser.roomname = myRoomname;
+            newroomuser.nickname = nickName;
+            const newRoomUser = firebase.database().ref("roomusers/").push();
+            newRoomUser.set(newroomuser);
+          } else {
+            alert("Room is full!");
+            setFull(true);
+            return;
+          }
         }
+        nextPage(myRoomname);
       });
-    if (nickName === "Admin") history.push("/auctioneer/" + myRoomname);
-    else {
-      history.push("/auctionroom/" + myRoomname);
-    }
   };
 
   const logout = () => {
@@ -91,7 +101,7 @@ function JoinRoom() {
   };
 
   const checkRoom = () => {
-    console.log(rooms);
+    //     console.log(rooms);
     const existingRoom = rooms.find((room) => room.roomname === myRoom);
 
     if (existingRoom) {
@@ -115,7 +125,7 @@ function JoinRoom() {
       </AppBar>
       <Container component="main" maxWidth="xs">
         <Paper className={classes.innerContainer} square>
-          {nickName === "Admin" ? (
+          {nickName === "###Admin@@@" ? (
             <Link to="/addroom">
               <img src={ipl} alt="IPL" className={classes.iplLogo} />
             </Link>

@@ -21,7 +21,6 @@ function Login() {
   const [user, setUser] = useState({
     nickName: "",
     wallet: 1000,
-    totalRating: 0,
   });
   const ref = firebase.database().ref("users/");
 
